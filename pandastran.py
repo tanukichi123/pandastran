@@ -48,9 +48,13 @@ class pandastran(object):
         Returns:
             pandas dataframe -- only card dataframe
         """
-
-        df = self.df_in.copy()
-        df_card = df[df["text"].str.contains(card_name)]
+        df=self.df_in.copy()
+        df=df[df["text"].str.contains(card_name)]
+        start_num = df.index[0]
+        count_row = df.index[1]-df.index[0]
+        end_num = df.tail(1).index[0]+count_row
+        df_card=self.df_in.copy()
+        df_card=df_card[start_num:end_num]
         return df_card
 
     def _separate_8moji(self,df):
