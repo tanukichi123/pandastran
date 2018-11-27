@@ -49,11 +49,28 @@ class pandastran(object):
             pandas dataframe -- only card dataframe
         """
 
-        df = self.df_in
+        df = self.df_in.copy()
         df_card = df[df["text"].str.contains(card_name)]
         return df_card
-#         if df_card[]
-#         df_card = df_grid["text"].str.split(',', expand=True)
+
+    def _separate_8moji(self,df):
+        """hyper mesh output dat or fem separete colunm
+        
+        Arguments:
+            df {pandas dataframe} -- one colum dataframe ex)"text"colum only
+        
+        Returns:
+            pandas dataframe -- 8string separate dataframe
+        """
+
+        moji = lambda x: x[8:]
+        for i in range(0,11,1):
+            df[str(i)]=df["text"].str.extract('(........)')
+            df["text"]= df["text"].map(moji)
+
+        df = df.drop('text', axis=1)
+        df = df.dropna(axis=1)
+        return df
 
     def _separate_open_vsp(self,df):
         """openvsp output dat separate colum
