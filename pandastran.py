@@ -25,7 +25,22 @@ class pandastran(object):
         with open(in_file_path, 'r', encoding="utf-8") as bdf_file:
             lines = bdf_file.readlines()
         self.df_in["text"]=lines
+        self.df_in["row_no"]=self.df_in.index
         self.df_in = self.df_in.replace("\n","",regex=True)
+        df=self.df_in.copy()
+        separate_row = df[df["text"].str.contains("BULK")].index[0]+1
+        df=df[df["text"]!=""]
+        df=df[~df["text"].str.startswith("$")]
+        df=df[~df["text"].str.startswith("END")]
+        df["card"]=df["text"].str[:8]
+        df=df.reset_index(drop=True)
+        self.df_in_EC_CC = df[:separate_row]
+        self.df_in_BD = df[separate_row:]
+        df = self.df_in_BD.copy()
+        df = df["card"].drop_duplicates()
+        df = df[~df.str.startswith(" ")]
+        df = df.str.replace(",","")
+        self.df_in_BD_card = df.str.strip()
 
     def write_file(self,df_out):
         """write out_put file 
