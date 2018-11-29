@@ -14,8 +14,10 @@ class pandastran(object):
     def __init__(self):
         self.out_file_path = "out_file.dat"
         self.df_in=pd.DataFrame()
+        self.BD_ignore_list = ["+","        "]
 
     def read_file(self,in_file_path):
+        #リファクタリングしましょう！
         """read input file(for all format)
         
         Arguments:
@@ -28,19 +30,24 @@ class pandastran(object):
         self.df_in["row_no"]=self.df_in.index
         self.df_in = self.df_in.replace("\n","",regex=True)
         df=self.df_in.copy()
-        separate_row = df[df["text"].str.contains("BULK")].index[0]+1
-        df=df[df["text"]!=""]
-        df=df[~df["text"].str.startswith("$")]
-        df=df[~df["text"].str.startswith("END")]
-        df["card"]=df["text"].str[:8]
-        df=df.reset_index(drop=True)
-        self.df_in_EC_CC = df[:separate_row]
-        self.df_in_BD = df[separate_row:]
-        df = self.df_in_BD.copy()
-        df = df["card"].drop_duplicates()
-        df = df[~df.str.startswith(" ")]
-        df = df.str.replace(",","")
-        self.df_in_BD_card = df.str.strip()
+        try:
+            separate_row = df[df["text"].str.contains("BULK")].index[0]+1
+            df=df[df["text"]!=""]
+            df=df[~df["text"].str.startswith("$")]
+            df=df[~df["text"].str.startswith("END")]
+            df["card"]=df["text"].str[:8]
+            df=df.reset_index(drop=True)
+            self.df_in_EC_CC = df[:separate_row]
+            self.df_in_BD = df[separate_row:]
+            df = self.df_in_BD.copy()
+            df = df["card"].drop_duplicates()
+            df = df[~df.str.startswith(" ")]
+            df = df.str.replace(",","")
+            df = df.str.strip()
+            #BD_ignore_listに含まれるものを落とす
+            self.df_in_BD_card = df
+        except:
+            print("Nothing BULK")
 
     def write_file(self,df_out):
         """write out_put file 
@@ -84,7 +91,7 @@ class pandastran(object):
 
         moji = lambda x: x[8:]
         for i in range(0,11,1):
-            df[str(i)]=df["text"].str.extract('(........)')
+            df[str(i)]=df["text"].str.extract('(........)',expand=True)
             df["text"]= df["text"].map(moji)
 
         df = df.drop('text', axis=1)
