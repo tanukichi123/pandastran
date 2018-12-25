@@ -139,3 +139,21 @@ class pandastran(object):
             text=lambda df: df.apply(lambda row: "".join(row), axis=1) # A-Eの和
         )
         return df[["text"]]
+    
+    def make_dataframe_from_lists(self,li):
+        """',' separate list to pandas dataframe 
+        
+        Arguments:
+            li {list} -- list "," separate some lists
+        
+        Returns:
+            pandas dataframe -- you can use output
+        """
+
+        df_out = pd.DataFrame()
+        for i in li:
+            df_temp = pd.DataFrame(i)
+            df_out = pd.concat([df_out,df_temp])
+        df_out = df_out.reset_index(drop=True)
+        df_out.columns = ["text"]
+        return df_out
