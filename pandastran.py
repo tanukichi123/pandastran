@@ -152,8 +152,11 @@ class pandastran(object):
 
         df_out = pd.DataFrame()
         for i in li:
-            df_temp = pd.DataFrame(i)
-            df_out = pd.concat([df_out,df_temp])
+            try:
+                df_temp = pd.DataFrame(i)
+                df_out = pd.concat([df_out,df_temp])
+            except:
+                df_out = pd.DataFrame(i)
         df_out = df_out.reset_index(drop=True)
         df_out.columns = ["text"]
         return df_out
